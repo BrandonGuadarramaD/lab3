@@ -1,0 +1,52 @@
+                                   Original
+
+TEST UIResponsiveness
+  UI_COMPONENT uiComponent = setupUIComponent(1024)
+  ASSERT_TRUE(uiComponent.adjustsToScreenSize(1024), "UI should adjust to width of 1024 pixels")
+END TEST
+
+
+                                    Verson mejorada
+
+MockGraphicsSystem graphicsSystem;
+
+SETUP
+  graphicsSystem.reset(); 
+END SETUP
+
+TEARDOWN
+  graphicsSystem.clear(); 
+END TEARDOWN
+
+TEST UIResponsivenessFor1024Width
+  UI_COMPONENT uiComponent = setupUIComponent(1024); 
+  ASSERT_TRUE(uiComponent.adjustsToScreenSize(1024), "UI should adjust to width of 1024 pixels");
+END TEST
+
+TEST UIResponsivenessFor768Width
+  UI_COMPONENT uiComponent = setupUIComponent(768); 
+  ASSERT_TRUE(uiComponent.adjustsToScreenSize(768), "UI should adjust to width of 768 pixels");
+END TEST
+
+TEST UIResponsivenessFor480Width
+  UI_COMPONENT uiComponent = setupUIComponent(480);
+  ASSERT_TRUE(uiComponent.adjustsToScreenSize(480), "UI should adjust to width of 480 pixels");
+END TEST
+
+TEST UIResponsivenessForSmallWidth
+  UI_COMPONENT uiComponent = setupUIComponent(0); 
+  ASSERT_FALSE(uiComponent.adjustsToScreenSize(0), "UI should not adjust to a width of 0 pixels");
+END TEST
+
+TEST UIResponsivenessForLargeWidth
+  UI_COMPONENT uiComponent = setupUIComponent(5000); 
+  ASSERT_TRUE(uiComponent.adjustsToScreenSize(5000), "UI should adjust to a width of 5000 pixels");
+END TEST
+
+
+Paso 1: Definir Objetivos Claros: Verificar que el componente de UI se ajuste correctamente a diferentes resoluciones de pantalla.
+Paso 2: Usar Nombres Descriptivos: Los nombres ahora expresan claramente el propósito de cada prueba
+Paso 3: Asegurar Aislamiento: Cada prueba debe ser independiente
+Paso 4: Implementar Setup/Teardown
+Paso 5: Manejo de Casos Extremos y Excepciones: Estas pruebas verifican cómo la UI se comporta en resoluciones atípicas
+Paso 6: Mocks y Stubs: Usar un mock para simular los distintos tamaños de pantalla sin depender de un entorno de ejecución particular.

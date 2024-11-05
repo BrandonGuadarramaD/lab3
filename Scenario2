@@ -1,0 +1,48 @@
+                                            Original
+
+TEST DataProcessing
+  DATA data = fetchData()
+  TRY
+    processData(data)
+    ASSERT_TRUE(data.processedSuccessfully, "Data should be processed successfully")
+  CATCH error
+    ASSERT_EQUALS("Data processing error", error.message, "Should handle processing errors")
+  END TRY
+END TEST
+
+
+                                        Version mejorada
+
+MockDataService dataService;
+
+SETUP
+  dataService.reset();
+END SETUP
+
+TEARDOWN
+  dataService.clear(); 
+END TEARDOWN
+
+TEST DataProcessingSuccess
+  DATA data = dataService.fetchData(); 
+  processData(data);
+  ASSERT_TRUE(data.processedSuccessfully, "Data should be processed successfully")
+END TEST
+
+TEST DataProcessingErrorHandling
+  DATA data = dataService.fetchDataWithError(); 
+  TRY
+    processData(data);
+    FAIL("Expected an error during data processing, but none occurred")
+  CATCH error
+    ASSERT_EQUALS("Data processing error", error.message, "Should handle processing errors")
+  END TRY
+END TEST
+
+
+Paso 1: Definir Objetivos Claros: Se defieron objetivo claros una para cuando el procesamiento se completa con éxito y otra para cuando ocurre un error.
+Paso 2: Usar Nombres Descriptivos: Los nombres ahora expresan claramente el propósito de cada prueba
+Paso 3: Asegurar Aislamiento: Cada prueba debe ser independiente
+Paso 4: Implementar Setup/Teardown
+Paso 5: Manejo de Casos Extremos y Excepciones Usamos fetchDataWithError para simular datos que provocan un error en processData.
+Paso 6: Mocks y Stubs:  Usar un mock para simular los datos necesarios para cada prueba.

@@ -1,0 +1,101 @@
+                                    Original
+
+TEST UserAuthentication
+  ASSERT_TRUE(authenticate("validUser", "validPass"), "Should succeed with correct credentials")
+  ASSERT_FALSE(authenticate("validUser", "wrongPass"), "Should fail with wrong credentials")
+END TEST
+
+
+                                       Aplicando mejoras
+
+Paso 1: Definir Objetivos Claros
+    Separar cada escenario en su propia prueba para evitar que ambas pruebas queden combinadas.
+        TEST UserAuthenticationWithCorrectCredentials
+        END TEST
+
+        TEST UserAuthenticationWithIncorrectCredentials
+        END TEST
+
+Paso 2: Usar Nombres Descriptivos
+        TEST UserAuthenticationWithCorrectCredentials
+            ASSERT_TRUE(authenticate("validUser", "validPass"), "Should succeed with correct credentials")
+        END TEST
+
+        TEST UserAuthenticationWithIncorrectCredentials
+            ASSERT_FALSE(authenticate("validUser", "wrongPass"), "Should fail with wrong credentials")
+        END TEST
+
+Paso 3: Asegurar Aislamiento
+     Asegurarse de que cada prueba sea independiente y que los datos iniciales no sean afectados por otras pruebas.
+
+        createUser("validUser", "validPass")
+        deleteUser("validUser")
+
+Paso 4: Implementar Setup/Teardown
+     Centralizar la creación de datos y el estado de prueba
+        SETUP
+            createUser("validUser", "validPass")
+        END SETUP
+
+        TEARDOWN
+            deleteUser("validUser")
+        END TEARDOWN
+
+Paso 5: Manejar Excepciones y Casos Extremos
+        TEST UserAuthenticationWithEmptyUsernameAndPassword
+            ASSERT_FALSE(authenticate("", ""), "Should fail with empty username and password")
+        END TEST
+
+        TEST UserAuthenticationWithEmptyUsername
+            ASSERT_FALSE(authenticate("", "validPass"), "Should fail with empty username")
+        END TEST
+
+        TEST UserAuthenticationWithEmptyPassword
+            ASSERT_FALSE(authenticate("validUser", ""), "Should fail with empty password")
+        END TEST
+
+Paso 6: Aplicar Mocks y Stubs
+    Si authenticate depende de una base de datos o servicio externo, simularlo 
+        TEST UserAuthenticationWithCorrectCredentialsUsingMock
+            authServer.setResponse("validUser", "validPass", true); 
+            ASSERT_TRUE(authenticate("validUser", "validPass"), "Should succeed with correct credentials")
+        END TEST
+
+                                            Version final
+
+MockAuthenticationServer authServer;
+
+    SETUP
+        createUser("validUser", "validPass")
+        authServer.reset(); 
+    END SETUP
+
+    TEARDOWN
+        deleteUser("validUser")
+        authServer.clearResponses();
+    END TEARDOWN
+
+    TEST UserAuthenticationWithCorrectCredentials
+        authServer.setResponse("validUser", "validPass", true); 
+        ASSERT_TRUE(authenticate("validUser", "validPass"), "Should succeed with correct credentials")
+    END TEST
+
+    TEST UserAuthenticationWithIncorrectCredentials
+        authServer.setResponse("validUser", "wrongPass", false); 
+        ASSERT_FALSE(authenticate("validUser", "wrongPass"), "Should fail with wrong credentials")
+    END TEST
+
+    TEST UserAuthenticationWithEmptyUsernameAndPassword
+        authServer.setResponse("", "", false); 
+        ASSERT_FALSE(authenticate("", ""), "Should fail with empty username and password")
+    END TEST
+
+    TEST UserAuthenticationWithEmptyUsername
+        authServer.setResponse("", "validPass", false); 
+        ASSERT_FALSE(authenticate("", "validPass"), "Should fail with empty username")
+    END TEST
+
+    TEST UserAuthenticationWithEmptyPassword
+        authServer.setResponse("validUser", "", false); 
+        ASSERT_FALSE(authenticate("validUser", ""), "Should fail with empty password")
+    END TEST
